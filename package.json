@@ -1,0 +1,24 @@
+{
+  "name": "viralengine",
+  "version": "1.0.0",
+  "description": "A search engine for all things viral",
+  "main": "index.html",
+  "repository": "https://github.com/ArnaudWeyts/viralengine.git",
+  "author": "Arnaud Weyts <arnaud.weyts@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "browser-sync": "^2.18.2",
+    "browserify": "^13.1.1",
+    "gulp": "^3.9.1",
+    "gulp-autoprefixer": "^3.1.1",
+    "gulp-cssnano": "^2.1.2",
+    "gulp-purifycss": "^0.2.0",
+    "gulp-rename": "^1.2.2",
+    "gulp-sass": "^2.3.2",
+    "gulp-sourcemaps": "^1.9.1",
+    "gulp-uglify": "^2.0.0",
+    "gulp-util": "^3.0.7",
+    "vinyl-buffer": "^1.0.0",
+    "vinyl-source-stream": "^1.1.0"
+  }
+}
