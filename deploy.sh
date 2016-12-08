@@ -37,6 +37,9 @@ git checkout $TARGET_BRANCH || git checkout --orphan $TARGET_BRANCH
 # Clean out existing contents except for the .git folder
 for i in `ls -A1 | grep -v ".git"`; do rm -rf $i; done; rm .gitignore || exit 0
 
+# get outta here
+cd ..
+
 # Run our compile script
 doCompile
 
