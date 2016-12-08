@@ -33,10 +33,9 @@ SHA=`git rev-parse --verify HEAD`
 git clone $REPO $DIRECTORY
 cd $DIRECTORY
 git checkout $TARGET_BRANCH || git checkout --orphan $TARGET_BRANCH
-cd ..
 
-# Clean out existing contents
-rm -rf $DIRECTORY/**/* || exit 0
+# Clean out existing contents except for the .git folder
+for i in `ls -A1 | grep -v ".git"`; do rm -rf $i; done; rm .gitignore || exit 0
 
 # Run our compile script
 doCompile
