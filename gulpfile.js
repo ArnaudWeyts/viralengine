@@ -1,89 +1,87 @@
-"use strict";
-
-var gulp = require("gulp"),
-rename = require("gulp-rename"),
-browserify = require("browserify"),
-source = require("vinyl-source-stream"),
-buffer = require("vinyl-buffer"),
-sourcemaps = require("gulp-sourcemaps"),
-gutil = require("gulp-util"),
-htmlmin = require("gulp-htmlmin"),
-sass = require("gulp-sass"),
-autoprefixer = require("gulp-autoprefixer"),
-purify = require("gulp-purifycss"),
-cssnano = require("gulp-cssnano"),
-uglify = require("gulp-uglify"),
-browserSync = require("browser-sync").create();
+var gulp = require('gulp');
+var sourcemaps = require('gulp-sourcemaps');
+var source = require('vinyl-source-stream');
+var buffer = require('vinyl-buffer');
+var browserify = require('browserify');
+var watchify = require('watchify');
+var babel = require('babelify');
+var uglify = require("gulp-uglify");
+var rename = require("gulp-rename");
+var htmlmin = require("gulp-htmlmin");
+var browserSync = require("browser-sync").create();
 
 var SRC = "./src";
-var DEST = "./_site";
+var DEST = "./build";
 
-gulp.task("html", function() {
+function compile(watch) {
+  // create bundler for js
+  var bundler = watchify(browserify(SRC + '/js/index.js', {debug: true}).transform(babel));
+
+  // bundle js
+  function rebundle() {
+    bundler.bundle()
+      .on('error', function(err) {
+        console.error(err);
+        this.emit('end');
+      })
+      .pipe(source('main.js'))
+      .pipe(rename({
+        suffix: '.min'
+      }))
+      .pipe(buffer())
+      .pipe(sourcemaps.init({loadMaps: true}))
+      // Add transformation tasks to the pipeline here.
+      .pipe(uglify())
+      .pipe(sourcemaps.write('./'))
+      .pipe(gulp.dest(DEST + "/assets/js"));
+  }
+
+  // build html
+  function html () {
     return gulp.src(SRC + "/html/*.html")
     .pipe(htmlmin({collapseWhitespace: true}))
     .pipe(gulp.dest(DEST));
-});
+  }
 
-gulp.task("sass", function () {
-    return gulp.src(SRC + "/sass/**/styles.scss")
-    .pipe(sass().on("error", sass.logError))
-    .pipe(autoprefixer({
-        browsers: [">1%"],
-        cascade: false
-    }))
-    .pipe(purify([DEST + "/assets/js/**/*.js", DEST + "/*.html"]))
-    .pipe(cssnano())
-    .pipe(rename({
-      suffix: '.min'
-    }))
-    .pipe(gulp.dest(DEST + "/assets/css/"))
-    .pipe(browserSync.stream())
-});
-
-gulp.task("scripts", function() {
-    // set up the browserify instance on a task basis
-    var b = browserify({
-        entries: SRC + "/js/scripts.js",
-        debug: true
+  // set your watch listeners here
+  if (watch) {
+    bundler.on('update', function() {
+      console.log('-> bundling...');
+      rebundle();
+      browserSync.reload();
     });
 
-    return b.bundle()
-    .pipe(source("main.js"))
-    .pipe(rename({
-      suffix: '.min'
-    }))
-    .pipe(buffer())
-    .pipe(sourcemaps.init({loadMaps: true}))
-        // Add transformation tasks to the pipeline here.
-        .pipe(uglify())
-        .on("error", gutil.log)
-    .pipe(sourcemaps.write("./"))
-    .pipe(gulp.dest(DEST + "/assets/js/"));
-});
-
-gulp.task("browser-sync", () => {
-    browserSync.init({
-        server: {
-            baseDir: DEST,
-            index: "index.html"
-        },
-        notify: false
+    gulp.watch(SRC + "/html/**/*.html").on("change", function() {
+      console.log('-> building html...');
+      html();
+      browserSync.reload();
     });
+  }
+
+  // set regular compile commands here
+  html();
+  rebundle();
+}
+
+function watch() {
+  // inits browserSync to automatically reload
+  browserSync.init({
+    server: {
+        baseDir: DEST,
+        index: "index.html"
+    },
+    notify: false
+  })
+
+  return compile(true);
+}
+
+gulp.task('build', function() {
+  return compile();
 });
 
-gulp.task("copy", function () {
-    /**
-        gulp.src(SRC + "/fonts/*")
-        .pipe(gulp.dest(DEST + "/assets/fonts"))
-    */
+gulp.task('watch', function() {
+  return watch();
 });
 
-gulp.task("watch", function () {
-    gulp.watch(SRC + "/html/**/*.html", ["html"]).on("change", browserSync.reload);
-    gulp.watch(SRC + "/sass/**/*.scss", ["sass"]).on("change", browserSync.reload);
-    gulp.watch(SRC + "/js/**/*.js", ["scripts"]).on("change", browserSync.reload);
-});
-
-gulp.task("default", ["watch", "html", "copy", "scripts", "sass", "browser-sync"]);
-gulp.task("compile", ["html", "copy", "scripts", "sass"]);
-
+gulp.task('default', ['watch']);
