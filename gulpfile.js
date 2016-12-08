@@ -15,10 +15,15 @@ var DEST = "./build";
 
 function compile(watch) {
   // create bundler for js
-  var bundler = watchify(browserify(SRC + '/js/index.js', {debug: true}).transform(babel));
+  var bundler = browserify(SRC + '/js/index.js', {debug: true}).transform(babel);
+
+  if (watch) {
+    bundler = watchify(bundler);
+  }
 
   // bundle js
   function rebundle() {
+    console.log('-> bundling...');
     bundler.bundle()
       .on('error', function(err) {
         console.error(err);
@@ -38,6 +43,7 @@ function compile(watch) {
 
   // build html
   function html () {
+    console.log('-> building html...');
     return gulp.src(SRC + "/html/*.html")
     .pipe(htmlmin({collapseWhitespace: true}))
     .pipe(gulp.dest(DEST));
@@ -45,14 +51,13 @@ function compile(watch) {
 
   // set your watch listeners here
   if (watch) {
+    console.log('-> watching over files... 👀')
     bundler.on('update', function() {
-      console.log('-> bundling...');
       rebundle();
       browserSync.reload();
     });
 
     gulp.watch(SRC + "/html/**/*.html").on("change", function() {
-      console.log('-> building html...');
       html();
       browserSync.reload();
     });
