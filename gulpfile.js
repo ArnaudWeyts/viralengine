@@ -1,92 +1,83 @@
-var gulp = require('gulp');
-var sourcemaps = require('gulp-sourcemaps');
-var source = require('vinyl-source-stream');
-var buffer = require('vinyl-buffer');
-var browserify = require('browserify');
-var watchify = require('watchify');
-var babel = require('babelify');
-var uglify = require("gulp-uglify");
-var rename = require("gulp-rename");
-var htmlmin = require("gulp-htmlmin");
-var browserSync = require("browser-sync").create();
+'use strict';
 
+var gulp = require('gulp');
+var gutil = require('gulp-util');
+var webpack = require('webpack');
+var browserSync = require('browser-sync');
+var webpackDevMiddleware = require('webpack-dev-middleware');
+var webpackHotMiddleware = require('webpack-hot-middleware');
+
+// non-webpack memes
+var htmlmin = require("gulp-htmlmin");
+var sass = require("gulp-sass");
+var autoprefixer = require("gulp-autoprefixer");
+var cssnano = require("gulp-cssnano");
+var rename = require("gulp-rename");
+
+// folder declaration
 var SRC = "./src";
 var DEST = "./build";
 
-function compile(watch) {
-  // create bundler for js
-  var bundler = browserify(SRC + '/js/index.js', {debug: true}).transform(babel);
+// build html
+gulp.task('html', function() {
+  return gulp.src(SRC + "/html/*.html")
+  .pipe(htmlmin({collapseWhitespace: true}))
+  .pipe(gulp.dest(DEST));
+})
 
-  if (watch) {
-    bundler = watchify(bundler);
-  }
+// build css
+gulp.task('css', function() {
+  return gulp.src(SRC + "/sass/styles.scss")
+  .pipe(sass().on("error", sass.logError))
+  .pipe(autoprefixer({
+      browsers: [">1%"],
+      cascade: false
+  }))
+  .pipe(cssnano())
+  .pipe(rename({
+    suffix: '.min'
+  }))
+  .pipe(gulp.dest(DEST + "/assets/css/"))
+  .pipe(browserSync.stream());
+})
 
-  // bundle js
-  function rebundle() {
-    console.log('-> bundling...');
-    bundler.bundle()
-      .on('error', function(err) {
-        console.error(err);
-        this.emit('end');
-      })
-      .pipe(source('main.js'))
-      .pipe(rename({
-        suffix: '.min'
-      }))
-      .pipe(buffer())
-      .pipe(sourcemaps.init({loadMaps: true}))
-      // Add transformation tasks to the pipeline here.
-      .pipe(uglify())
-      .pipe(sourcemaps.write('./'))
-      .pipe(gulp.dest(DEST + "/assets/js"));
-  }
-
-  // build html
-  function html () {
-    console.log('-> building html...');
-    return gulp.src(SRC + "/html/*.html")
-    .pipe(htmlmin({collapseWhitespace: true}))
-    .pipe(gulp.dest(DEST));
-  }
-
-  // set your watch listeners here
-  if (watch) {
-    console.log('-> watching over files... 👀')
-    bundler.on('update', function() {
-      rebundle();
-      browserSync.reload();
-    });
-
-    gulp.watch(SRC + "/html/**/*.html").on("change", function() {
-      html();
-      browserSync.reload();
-    });
-  }
-
-  // set regular compile commands here
-  html();
-  rebundle();
-}
-
-function watch() {
-  // inits browserSync to automatically reload
-  browserSync.init({
+// builds our developer version with hot loading and dank memes
+gulp.task('serve', ['build'], function(callback) {
+  var webpackSettings = require('./libs/webpack.config.js');
+  var bundler = webpack(webpackSettings);
+  browserSync({
     server: {
-        baseDir: DEST,
-        index: "index.html"
-    },
-    notify: false
-  })
+    baseDir: [ DEST ],
+    middleware: [
+       webpackDevMiddleware(bundler, {
+        publicPath: webpackSettings.output.publicPath,
+        stats: { colors: true }
+       }),
+       webpackHotMiddleware(bundler)
+     ]
+   },
+   files: [
+    DEST + '/**/*.html'
+   ]
+  });
+  console.log("-> Watching other files 👀");
+  gulp.watch(SRC + "/html/**/*.html", ["html"]);
+  gulp.watch(SRC + "/sass/**/*.scss", ["css"]);
+})
 
-  return compile(true);
-}
+// builds a production version
+gulp.task('build', ['html', 'css'], function(callback) {
+  var webpackSettings = require('./libs/webpack.prod.config.js');
+  webpack(webpackSettings,
+    function(err, stats) {
+      if(err) throw new gutil.PluginError("webpack", err);
+      gutil.log("[webpack]", stats.toString({
+        colors: true
+      }));
+      callback();
+    }
+  );
+})
 
-gulp.task('build', function() {
-  return compile();
-});
-
-gulp.task('watch', function() {
-  return watch();
-});
-
-gulp.task('default', ['watch']);
+// default task
+gulp.task('default', ['serve']);
