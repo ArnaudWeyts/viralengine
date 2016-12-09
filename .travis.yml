@@ -6,7 +6,7 @@ branches:
   only:
   - master
 script:
-- ./deploy.sh
+- ./libs/deploy.sh
 env:
   global:
     secure: x9XHpVHk3uuwBcs7xXS48j+OkgqFx/ZskcFnLagm5CvpRH8H+74vybj2U8nOG6LJOQWxeDKhjMuHHMi9fnKXkgr+aWfSD3c43xrenT9lmRPxHBhiuSwg7GjjSXjWUg6uCEG30RIm9bDOWQqLndOq/QK6t4cjWjpRfherK9G1XCrfEQVqGwF///+LGsDq3kzyB2ZrFvlX5hRasPqnV8FjaszbbqAStkA/yxZJZigQn+B752YYkAMm0oNUTo+xMkeXPMrmiGoqVubc1PYeFHdJE9Ifh5uDKRepSp0E2042m9SOp4btoE97Tk8Op4VwURsUS5c1FQvNbtckKGShGi0B/S1OUGqqbHJtdsPOfzH+Rh4MwxZEkJmIQ25/mRR5xT5A+z2/OclH44B16McAT6vr2rmpivO/vFHyuevtVwKcdU1DgJ7bG88E0s+UZOxpJ0lw1gXexUGBtnECTEI4MbaLFZ80zRk26Ktm4vKnBlRSoIjE6R9PKospVtOS3px7JfYt13Z4TYkUTmUnN6sgmtPQiJEynI5MqfOswCsGz1LoUeTRhQw5zErrK63ciir+mRn2Qd0+5FuAmuaF+speLcHqmfCcLMoOCEZM1fLkgnXk4fpf+FeEJiess0hMoGn6wnCsdpavDXWW46FLbAEwqloCk0nRdJXiOIcvMZGdwl5LFT8=
