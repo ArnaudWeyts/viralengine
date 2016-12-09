@@ -11,7 +11,6 @@ var webpackHotMiddleware = require('webpack-hot-middleware');
 var htmlmin = require("gulp-htmlmin");
 var sass = require("gulp-sass");
 var autoprefixer = require("gulp-autoprefixer");
-var purify = require("gulp-purifycss");
 var cssnano = require("gulp-cssnano");
 var rename = require("gulp-rename");
 
