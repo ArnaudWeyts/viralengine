@@ -1,19 +1,51 @@
 'use strict';
 
 var gulp = require('gulp');
+var gutil = require('gulp-util');
 var webpack = require('webpack');
 var browserSync = require('browser-sync');
 var webpackDevMiddleware = require('webpack-dev-middleware');
 var webpackHotMiddleware = require('webpack-hot-middleware');
 
+// non-webpack memes
+var htmlmin = require("gulp-htmlmin");
+var sass = require("gulp-sass");
+var autoprefixer = require("gulp-autoprefixer");
+var purify = require("gulp-purifycss");
+var cssnano = require("gulp-cssnano");
+var rename = require("gulp-rename");
+
+// folder declaration
 var SRC = "./src";
 var DEST = "./build";
 
-var webpackSettings = require('./tasks/webpack.config.js');
+// build html
+gulp.task('html', function() {
+  return gulp.src(SRC + "/html/*.html")
+  .pipe(htmlmin({collapseWhitespace: true}))
+  .pipe(gulp.dest(DEST));
+})
 
-var bundler = webpack(webpackSettings);
+// build css
+gulp.task('css', function() {
+  return gulp.src(SRC + "/sass/styles.scss")
+  .pipe(sass().on("error", sass.logError))
+  .pipe(autoprefixer({
+      browsers: [">1%"],
+      cascade: false
+  }))
+  .pipe(cssnano())
+  .pipe(rename({
+    suffix: '.min'
+  }))
+  .pipe(gulp.dest(DEST + "/assets/css/"))
+  .pipe(browserSync.stream());
+})
 
-gulp.task('dev', function(callback) {
+// builds our developer version with hot loading and dank memes
+gulp.task('serve', ['build'], function(callback) {
+  var webpackSettings = require('./libs/webpack.config.js');
+  var bundler = webpack(webpackSettings);
   browserSync({
     server: {
     baseDir: [ DEST ],
@@ -26,69 +58,27 @@ gulp.task('dev', function(callback) {
      ]
    },
    files: [
-    DEST + '/assets/css/**/*.css',
     DEST + '/**/*.html'
    ]
- });
+  });
+  console.log("-> Watching other files 👀");
+  gulp.watch(SRC + "/html/**/*.html", ["html"]);
+  gulp.watch(SRC + "/sass/**/*.scss", ["css"]);
 })
 
-gulp.task('build', function(callback) {
-  console.log(bundler);
+// builds a production version
+gulp.task('build', ['html', 'css'], function(callback) {
+  var webpackSettings = require('./libs/webpack.prod.config.js');
+  webpack(webpackSettings,
+    function(err, stats) {
+      if(err) throw new gutil.PluginError("webpack", err);
+      gutil.log("[webpack]", stats.toString({
+        colors: true
+      }));
+      callback();
+    }
+  );
 })
 
-// // sets env node to production
-// gulp.task('set-prod-node-env', function() {
-//     return process.env.NODE_ENV = 'production';
-// });
-
-// // sets env node to developement
-// gulp.task('set-dev-node-env', function() {
-//     return process.env.NODE_ENV = 'development';
-// });
-
-// // serve dev or production
-// gulp.task('serve', ['set-dev-node-env', 'html', 'css', 'bundle', 'watch'], require('./tasks/serve'));
-// gulp.task('serve_prod', ['set-prod-node-env', 'html', 'css', 'bundle', 'watch'], require('./tasks/serve'));
-
-// // build without serving
-// gulp.task('build', ['set-prod-node-env', 'html', 'css', 'bundle']);
-
-// // show where tasks are located
-// gulp.task('watch', require('./tasks/watch'));
-// gulp.task('bundle', require('./tasks/bundle'));
-
-// // default task
-// gulp.task('default', ['serve']);
-
-// // other tasks
-// var htmlmin = require("gulp-htmlmin");
-// var sass = require("gulp-sass");
-// var autoprefixer = require("gulp-autoprefixer");
-// var purify = require("gulp-purifycss");
-// var cssnano = require("gulp-cssnano");
-// var rename = require("gulp-rename");
-// var browserSync = require('browser-sync');
-
-// // build html
-// gulp.task('html', function() {
-//   return gulp.src(SRC + "/html/*.html")
-//   .pipe(htmlmin({collapseWhitespace: true}))
-//   .pipe(gulp.dest(DEST));
-// })
-
-// // build css
-// gulp.task('css', function() {
-//   return gulp.src(SRC + "/sass/styles.scss")
-//   .pipe(sass().on("error", sass.logError))
-//   .pipe(autoprefixer({
-//       browsers: [">1%"],
-//       cascade: false
-//   }))
-//   .pipe(purify([DEST + "/assets/js/**/*.js", DEST + "/*.html"]))
-//   .pipe(cssnano())
-//   .pipe(rename({
-//     suffix: '.min'
-//   }))
-//   .pipe(gulp.dest(DEST + "/assets/css/"))
-//   .pipe(browserSync.stream());
-// })
+// default task
+gulp.task('default', ['serve']);
