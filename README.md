@@ -3,7 +3,10 @@
 
 #Viralengine
 
+**⚠️ This project is on hold until I actually know what I'm doing in React 😂.**
+
 This is going to be a search engine for viral posts built on top of react.
+
 Do keep in mind that this is more of a learning experience for me, getting to know React.
 
 To install:
