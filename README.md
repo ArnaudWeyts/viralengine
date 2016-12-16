@@ -3,7 +3,7 @@
 
 #Viralengine
 
-**⚠️ This project is on hold until I actually know what I'm doing in React 😂.**
+**⚠️ This project is going to be slow af until I actually know what I'm doing in React 😂.**
 
 This is going to be a search engine for viral posts built on top of react.
 
