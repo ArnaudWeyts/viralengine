@@ -3,7 +3,7 @@
 
 #Viralengine
 
-**Idk what I'm doing thb but React is pretty cool. 🐸**
+**Idk what I'm doing tbh but React is pretty cool. 🐸**
 
 This is going to be a search engine for viral posts built on top of react.
 
