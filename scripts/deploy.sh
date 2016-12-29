@@ -14,7 +14,7 @@ GH_USERMAIL="bot@weyts.xyz"
 
 # set your build commands here
 function doCompile {
-  yarn build
+  yarn run build
 }
 
 # Pull requests and commits to other branches shouldn't try to deploy, just build to verify
