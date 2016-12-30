@@ -29,13 +29,16 @@ REPO=`git config remote.origin.url`
 SHA=`git rev-parse --verify HEAD`
 
 # Clone repository
-git clone $REPO
+git clone $REPO $DIRECTORY
+cd $DIRECTORY
 git checkout $TARGET_BRANCH || git checkout --orphan $TARGET_BRANCH
 git config user.name $GH_USERNAME
 git config user.email $GH_USERMAIL
 
 # Move our .git folder too safety!
 mv .git ../.git2
+
+cd ..
 
 # Run our compile script (This sometimes completely cleanes out the build directory,
 # hence why we moved our .git folder too safety
