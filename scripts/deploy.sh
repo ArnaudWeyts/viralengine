@@ -28,17 +28,24 @@ fi
 REPO=`git config remote.origin.url`
 SHA=`git rev-parse --verify HEAD`
 
-# Run our compile script
+# Clone repository
+git clone $REPO
+git checkout $TARGET_BRANCH || git checkout --orphan $TARGET_BRANCH
+git config user.name $GH_USERNAME
+git config user.email $GH_USERMAIL
+
+# Move our .git folder too safety!
+mv .git ../.git2
+
+# Run our compile script (This sometimes completely cleanes out the build directory,
+# hence why we moved our .git folder too safety
 doCompile
+
+# Move our .git back to where it belongs
+mv .git2 $DIRECTORY/.git
 
 # Now let's go have some fun with the cloned repo
 cd $DIRECTORY
-# Set up the repository
-git init
-git config user.name $GH_USERNAME
-git config user.email $GH_USERMAIL
-git remote add origin "https://{$GH_REF}.git"
-git checkout --orphan $TARGET_BRANCH
 
 # stage new files & deleted files
 git add -A
