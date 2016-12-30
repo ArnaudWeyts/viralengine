@@ -28,25 +28,17 @@ fi
 REPO=`git config remote.origin.url`
 SHA=`git rev-parse --verify HEAD`
 
-# Clone the existing gh-pages for this repo into _site/
-# Create a new empty branch if gh-pages doesn't exist yet (should only happen on first deploy)
-git clone $REPO $DIRECTORY
-cd $DIRECTORY
-git checkout $TARGET_BRANCH || git checkout --orphan $TARGET_BRANCH
-
-# Clean out existing contents except for the .git folder
-for i in `ls -A1 | grep -v ".git"`; do rm -rf $i; done; rm -f .gitignore > /dev/null
-
-# get outta here
-cd ..
-
 # Run our compile script
 doCompile
 
 # Now let's go have some fun with the cloned repo
 cd $DIRECTORY
+# Set up the repository
+git init
 git config user.name $GH_USERNAME
 git config user.email $GH_USERMAIL
+git remote add origin "https://{$GH_REF}.git"
+git checkout --orphan $TARGET_BRANCH
 
 # stage new files & deleted files
 git add -A
