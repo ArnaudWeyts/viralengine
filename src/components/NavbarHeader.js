@@ -9,10 +9,7 @@ export default class NavbarHeader extends React.Component {
           <NavbarBrand href="/">viralengine</NavbarBrand>
           <Nav className="float-xs-right" navbar>
             <NavItem>
-              <NavLink href="/components/">Components</NavLink>
-            </NavItem>
-            <NavItem>
-              <NavLink href="https://github.com/reactstrap/reactstrap">Github</NavLink>
+              <NavLink href="https://github.com/arnaudweyts/viralengine">Github</NavLink>
             </NavItem>
           </Nav>
         </Navbar>

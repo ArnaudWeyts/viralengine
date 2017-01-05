@@ -1,11 +1,18 @@
 import React, { Component } from 'react';
-import NavbarHeader from './components/NavbarHeader';
 import './scss/App.scss';
+
+import NavbarHeader from './components/NavbarHeader';
+import SearchForm from './components/SearchForm';
 
 class App extends Component {
   render() {
     return (
-      <NavbarHeader />
+      <div>
+        <NavbarHeader />
+        <div className="content">
+          <SearchForm />
+        </div>
+      </div>
     );
   }
 }
