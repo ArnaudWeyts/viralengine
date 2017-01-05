@@ -52,7 +52,7 @@
     "whatwg-fetch": "1.0.0"
   },
   "dependencies": {
-    "bootstrap": "twbs/bootstrap#v4-dev",
+    "bootstrap": "4.0.0-alpha.5",
     "react": "^15.4.1",
     "react-dom": "^15.4.1",
     "react-redux": "^5.0.1",
