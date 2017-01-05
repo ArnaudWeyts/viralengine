@@ -31,7 +31,7 @@ const apiMiddleware = (store) => (next) => (action) => {
 
 // configure our store (not combining reducers because we only have one atm)
 export const configureStore = () => {
-  const store = createStore(searchResults.reducer);
+  const store = createStore(searchResults.reducer, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());
 
   const actions = {
     searchResults: bindActionCreators(searchResults.actions, store.dispatch)
