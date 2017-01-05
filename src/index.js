@@ -1,8 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import App from './App';
+import Root from './containers/Root';
+
+// Create redux store
+import configureStore from './redux/configureStore';
+const {store, actions} = configureStore();
 
 ReactDOM.render(
-  <App />,
+  <Root store={store} actions={actions}/>,
   document.getElementById('root')
 )
